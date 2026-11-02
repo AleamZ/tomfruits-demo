@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Form, Input, Button, Card, Typography, Row, Col, message } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
+import smewLogo from "../assets/logo-smew.png";
 import {
   loginService,
   LoginRequest,
@@ -78,6 +79,13 @@ const LoginLayout = () => {
     >
       <Col xs={22} sm={16} md={12} lg={8} xl={6}>
         <Card style={{ boxShadow: "0 4px 8px rgba(0,0,0,0.1)" }}>
+          <div style={{ textAlign: "center", marginBottom: 12 }}>
+            <img
+              src={smewLogo}
+              alt="SMEW Technology"
+              style={{ width: 180, maxWidth: "70%", height: "auto" }}
+            />
+          </div>
           <Title
             level={2}
             style={{ textAlign: "center", marginBottom: "20px" }}

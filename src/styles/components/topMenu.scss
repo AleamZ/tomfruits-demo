@@ -12,9 +12,11 @@
 
         .logo-container {
             .logo {
-                width: 100%;
+                display: block;
+                width: auto;
                 max-width: 200px;
-                height: auto;
+                height: 48px;
+                object-fit: contain;
             }
         }
 

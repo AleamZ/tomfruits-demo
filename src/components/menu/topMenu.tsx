@@ -1,5 +1,5 @@
 import { Row, Col } from 'antd';
-import logoImage from '../../assets/logo.png';
+import logoImage from '../../assets/logo-smew.png';
 import { SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Space, Dropdown, Menu } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
@@ -91,7 +91,7 @@ const TopMenu = () => {
                     <Row className='middle-header'>
                         <Col className="logo-container">
                             <Link to="/">
-                                <img src={logoImage} alt="Company Logo" className="logo" />
+                                <img src={logoImage} alt="SMEW Technology" className="logo" />
                             </Link>
                         </Col>
                         <Col className='function-container'>
