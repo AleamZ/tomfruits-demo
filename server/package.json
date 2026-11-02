@@ -1,0 +1,13 @@
+{
+  "name": "kiotviet-sync-server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Đồng bộ sản phẩm & tồn kho KiotViet cho Sales-Management",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node index.mjs"
+  }
+}

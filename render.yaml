@@ -1,0 +1,28 @@
+# Render Blueprint: server đồng bộ KiotViet (thư mục server/)
+services:
+  - type: web
+    name: tomfruits-kiotviet-sync
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: "true"
+    startCommand: node index.mjs
+    healthCheckPath: /kiotviet/status
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: KIOTVIET_RETAILER
+        sync: false
+      - key: KIOTVIET_CLIENT_ID
+        sync: false
+      - key: KIOTVIET_CLIENT_SECRET
+        sync: false
+      - key: KIOTVIET_WEBHOOK_SECRET
+        generateValue: true
+      - key: ADMIN_KEY
+        generateValue: true
+      - key: SYNC_INTERVAL_MINUTES
+        value: "10"
+      # Domain Vercel của giao diện, vd https://tomfruits-demo.vercel.app
+      - key: CORS_ORIGIN
+        sync: false

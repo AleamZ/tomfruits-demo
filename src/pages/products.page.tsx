@@ -18,6 +18,7 @@ import {
   Descriptions,
   Tag,
   Tabs,
+  Tooltip,
 } from "antd";
 import {
   PlusOutlined,
@@ -29,7 +30,9 @@ import {
   EditOutlined,
   FileOutlined,
   SearchOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
+import { getKiotVietStatus, syncKiotViet } from "../services/kiotviet.service";
 import { useEffect, useState, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query"; // Import React Query
 import debounce from "lodash.debounce"; // Import debounce function
@@ -59,8 +62,31 @@ import { handleErrorMessage, handleCRUDError, showWarningMessage } from "../util
 
 const { Text, Title } = Typography;
 
+const kiotvietEnabled = (import.meta.env.VITE_APP_KIOTVIET ?? "false").toString() === "true";
+
 const ProductsPage = () => {
   const queryClient = useQueryClient(); // Initialize the query client
+  const [syncingKiotViet, setSyncingKiotViet] = useState(false);
+  const { data: kiotvietStatus, refetch: refetchKiotVietStatus } = useQuery({
+    queryKey: ["kiotvietStatus"],
+    queryFn: getKiotVietStatus,
+    enabled: kiotvietEnabled,
+    refetchInterval: 60_000,
+  });
+  const handleSyncKiotViet = async () => {
+    setSyncingKiotViet(true);
+    try {
+      const result = await syncKiotViet();
+      message.success(`Đã đồng bộ ${result.count} sản phẩm thay đổi từ KiotViet`);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      refetchKiotVietStatus();
+    } catch (error) {
+      handleErrorMessage(error, "Đồng bộ KiotViet thất bại");
+    } finally {
+      setSyncingKiotViet(false);
+    }
+  };
   const [productsList, setProductsList] = useState<ProductData[]>([]);
   const [loadingProducts, setLoadingProducts] = useState<boolean>(true);
   const [productsError, setProductsError] = useState<string | null>(null);
@@ -642,6 +668,14 @@ const ProductsPage = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="Tồn kho">
                       {detailedProduct.stock || 0}
+                      {detailedProduct.inventories?.map((inv) => (
+                        <div key={inv.branchId}>
+                          <Text type="secondary">
+                            {inv.branchName}: {inv.onHand}
+                            {inv.reserved ? ` (đặt ${inv.reserved})` : ""}
+                          </Text>
+                        </div>
+                      ))}
                     </Descriptions.Item>
                     <Descriptions.Item label="Giá bán">
                       {formatCurrency(detailedProduct.sellPrice)}
@@ -1071,6 +1105,24 @@ const ProductsPage = () => {
                   </Space>
                 ) : (
                   <>
+                    {kiotvietEnabled && (
+                      <Tooltip
+                        title={
+                          kiotvietStatus?.lastSyncAt
+                            ? `${kiotvietStatus.productCount} sản phẩm, đồng bộ lúc ${new Date(kiotvietStatus.lastSyncAt).toLocaleString("vi-VN")}`
+                            : "Chưa đồng bộ"
+                        }
+                      >
+                        <Button
+                          icon={<SyncOutlined spin={syncingKiotViet} />}
+                          loading={syncingKiotViet}
+                          onClick={handleSyncKiotViet}
+                          style={{ marginRight: 8 }}
+                        >
+                          Đồng bộ KiotViet
+                        </Button>
+                      </Tooltip>
+                    )}
                     <Button
                       type="primary"
                       icon={<PlusOutlined />}

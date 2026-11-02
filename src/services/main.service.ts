@@ -16,9 +16,22 @@ const axiosInstance: AxiosInstance = axios.create({
 
 // Enable mock mode via env or default to true for live demo
 const mockEnabled = (import.meta.env.VITE_APP_USE_MOCK ?? "true").toString() === "true";
+// Sản phẩm, tồn kho, danh mục lấy thật từ KiotViet qua server/ (các phần khác vẫn mock)
+const kiotvietEnabled = (import.meta.env.VITE_APP_KIOTVIET ?? "false").toString() === "true";
+const KIOTVIET_GET_PATHS = [/^\/products$/, /^\/products\/[^/]+$/, /^\/products\/variables\//, /^\/categories$/];
+const isKiotVietRequest = (url: string, method: string) =>
+  url.startsWith("/kiotviet/") || (method === "get" && KIOTVIET_GET_PATHS.some((re) => re.test(url)));
+
 if (mockEnabled) {
-  axiosInstance.defaults.adapter = createMockAdapter();
-  console.log("🧪 Mock API enabled");
+  const mockAdapter = createMockAdapter();
+  const realAdapter = axios.getAdapter(axios.defaults.adapter);
+  axiosInstance.defaults.adapter = (config) => {
+    const url = (config.url || "").split("?")[0];
+    const method = (config.method || "get").toLowerCase();
+    if (kiotvietEnabled && isKiotVietRequest(url, method)) return realAdapter(config);
+    return mockAdapter(config);
+  };
+  console.log(kiotvietEnabled ? "🧪 Mock API enabled (sản phẩm từ KiotViet)" : "🧪 Mock API enabled");
 }
 
 axiosInstance.interceptors.request.use(

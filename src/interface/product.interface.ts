@@ -18,6 +18,15 @@ export interface ProductData {
     createdAt?: string;
     updatedAt?: string;
     isDelete?: boolean;
+    source?: "kiotviet";
+    inventories?: ProductInventory[]; // Tồn theo chi nhánh KiotViet
+}
+export interface ProductInventory {
+    branchId: number;
+    branchName?: string;
+    onHand: number;
+    reserved: number;
+    cost: number;
 }
 export interface ProductDataToCreate extends Omit<ProductData, '_id' | 'createdAt' | 'updatedAt'> {
     // [x: string]: { attribute: Attribute[]; costPrice: number; sellPrice: number; stock: number; description: string; mainImage: string; listImage: string[]; isDelete: boolean; isSerial: boolean; serials: string[]; }[];
